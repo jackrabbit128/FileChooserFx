@@ -4,6 +4,8 @@ import com.chainstaysoftware.filechooser.icons.Icons;
 import com.chainstaysoftware.filechooser.icons.IconsImpl;
 import com.chainstaysoftware.filechooser.preview.PreviewPane;
 import impl.org.controlsfx.skin.BreadCrumbBarSkin;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -539,6 +541,91 @@ public final class FileChooserFxImpl implements FileChooserFx {
 
       setCurrentView(viewTypeProperty().getValue());
       updateWatchDirectory();
+   }
+
+   /**
+    * Create a node containing the content of the dialog that would appear when using {@link
+    * #showOpenDialog(Window,FileChooserCallback) showOpenDialog}. Do not interact with this instance after calling this
+    * method!
+    *
+    * @param fileChooserCallback the callback, invoked every time the user selects a different file
+    * @return the node
+    */
+   public Node createOpenNode(final FileChooserCallback fileChooserCallback) {
+      saveMode = false;
+      return createNode(fileChooserCallback);
+   }
+
+   /**
+    * Create a node containing the content of the dialog that would appear when using {@link
+    * #showOpenDialog(Window,FileChooserCallback,boolean) showOpenDialog}. Do not interact with this instance after
+    * calling this method!
+    *
+    * @param fileChooserCallback the callback, invoked every time the user selects a different file
+    * @return the node
+    */
+   Node createOpenNode(final FileChooserCallback fileChooserCallback,
+                       final boolean hideFiles) {
+      saveMode = false;
+      this.hideFiles.setValue(hideFiles);
+      return createNode(fileChooserCallback);
+   }
+
+   /**
+    * Create a node containing the content of the dialog that would appear when using {@link #showSaveDialog}. Do not
+    * interact with this instance after calling this method!
+    *
+    * @param fileChooserCallback the callback, invoked every time the user selects a different file
+    * @return the node
+    */
+   public Node createSaveNode(final FileChooserCallback fileChooserCallback) {
+      saveMode = true;
+      hideFiles.set(false);
+      return createNode(fileChooserCallback);
+   }
+
+   private Node createNode(final FileChooserCallback fileChooserCallback) {
+      this.fileChooserCallback = fileChooserCallback;
+      currentSelection.addListener((observable, oldValue, newValue) -> this.fileChooserCallback.fileChosen(
+              null == newValue ? Optional.empty() :
+                      Optional.ofNullable(shouldHideFiles() == newValue.isDirectory() ? newValue : null)));
+
+      stage = new Stage();
+
+      final VBox topVbox = createTopVBox();
+      splitPane = createSplitPane();
+      final Pane bottomVbox = createBottomVBox();
+
+      final BorderPane borderPane = new BorderPane();
+      borderPane.setTop(topVbox);
+      borderPane.setCenter(splitPane);
+      borderPane.setBottom(bottomVbox);
+
+      borderPane.setPrefWidth(widthProperty.doubleValue());
+      borderPane.setPrefHeight(heightProperty.doubleValue());
+      borderPane.getStylesheets().add(new FileBrowserCss().getUrl());
+      borderPane.heightProperty().addListener((observable, oldValue, newValue) -> heightProperty.setValue(newValue));
+      borderPane.widthProperty().addListener((observable, oldValue, newValue) -> widthProperty.setValue(newValue));
+
+      BooleanBinding showing = Bindings.selectBoolean(borderPane, "scene", "window", "showing");
+      showing.addListener((observable, oldValue, newValue) -> {
+         if (newValue) {
+            updateWatchDirectory();
+         }
+         else {
+            dirWatchingService.cancel();
+         }
+      });
+
+      placesView.updatePlaces();
+      currentDirectory = getInitialDirectory() == null
+              ? new File(".")
+              : initialDirectory.getValue();
+
+      setCurrentView(viewTypeProperty().getValue());
+      updateWatchDirectory();
+
+      return borderPane;
    }
 
    /**
