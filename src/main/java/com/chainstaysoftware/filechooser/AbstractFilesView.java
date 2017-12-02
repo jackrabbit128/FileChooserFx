@@ -40,7 +40,8 @@ abstract class AbstractFilesView implements FilesView {
          return;
       }
 
-      parent.getScene().setCursor(Cursor.WAIT);
+      CursorHelper cursorHelper = CursorHelper.forSceneOf(parent);
+      cursorHelper.setCursor(Cursor.WAIT);
 
       Platform.runLater(() -> new FilesViewRunnable(previewPaneOpt.orElseThrow(IllegalStateException::new),
          file));
@@ -85,7 +86,7 @@ abstract class AbstractFilesView implements FilesView {
          stage.setTitle(getTitle(file));
          stage.setWidth(1024);
          stage.setHeight(768);
-         stage.setOnShown(windowEvent -> parent.getScene().setCursor(null));
+         stage.setOnShown(windowEvent -> cursorHelper.setCursor(null));
          stage.show();
       }
 
