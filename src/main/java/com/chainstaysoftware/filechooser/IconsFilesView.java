@@ -323,10 +323,11 @@ class IconsFilesView extends AbstractFilesView {
             selectedCellIndex.setValue(target.getIndex());
 
             final File file = gridView.getItems().get(selectedCellIndex.get()).getFile();
-            IconsFilesView.this.getNode().getScene().setCursor(Cursor.WAIT);
+            CursorHelper cursorHelper = CursorHelper.forSceneOf(IconsFilesView.this.getNode());
+            cursorHelper.setCursor(Cursor.WAIT);
             Platform.runLater(() -> {
                callback.setCurrentSelection(file);
-               IconsFilesView.this.getNode().getScene().setCursor(null);
+               cursorHelper.setCursor(null);
             });
          }
       }
