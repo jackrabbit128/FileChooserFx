@@ -2,9 +2,6 @@ package com.chainstaysoftware.filechooser;
 
 import com.chainstaysoftware.filechooser.preview.PreviewPane;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -13,7 +10,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -44,7 +40,8 @@ abstract class AbstractFilesView implements FilesView {
          return;
       }
 
-      parent.getScene().setCursor(Cursor.WAIT);
+      CursorHelper cursorHelper = CursorHelper.forSceneOf(parent);
+      cursorHelper.setCursor(Cursor.WAIT);
 
       Platform.runLater(() -> {
          final Stage stage = new Stage();
@@ -76,7 +73,7 @@ abstract class AbstractFilesView implements FilesView {
          stage.setTitle(getTitle(file));
          stage.setWidth(1024);
          stage.setHeight(768);
-         stage.setOnShown(windowEvent -> parent.getScene().setCursor(null));
+         stage.setOnShown(windowEvent -> cursorHelper.setCursor(null));
          stage.show();
       });
    }

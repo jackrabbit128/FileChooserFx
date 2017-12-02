@@ -261,7 +261,7 @@ class ListFilesView extends AbstractFilesView {
                   }
 
                   final MenuItem imagePreviewItem = new MenuItem("Preview");
-                  imagePreviewItem.setOnAction(v -> showPreview(previewPaneClass, file));
+                  imagePreviewItem.setOnAction(v ->showPreview(previewPaneClass, file));
 
                   setContextMenu(new ContextMenu(imagePreviewItem));
                }
@@ -484,8 +484,8 @@ class ListFilesView extends AbstractFilesView {
    private class WrappedTreeTableView<S> extends TreeTableView<S> {
       @Override
       public void sort() {
-         getScene().setCursor(Cursor.WAIT);
-         setCursor(Cursor.WAIT);
+         CursorHelper cursorHelper = CursorHelper.forNodeAndSceneOf(this);
+         cursorHelper.setCursor(Cursor.WAIT);
 
          // This is a hack to schedule the sort for 'later' so that the wait cursor
          // can paint. Without this hack, the wait cursor is not painting on linux
@@ -493,8 +493,7 @@ class ListFilesView extends AbstractFilesView {
          final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
          executor.schedule(() -> Platform.runLater(() -> {
             super.sort();
-            setCursor(null);
-            getScene().setCursor(null);
+            cursorHelper.setCursor(null);
             executor.shutdown();
          }), 1, TimeUnit.MILLISECONDS);
       }

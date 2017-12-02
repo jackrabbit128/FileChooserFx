@@ -260,16 +260,17 @@ class ListFilesWithPreviewView extends AbstractFilesView {
 
          File newFile = newValue == null ? null : newValue.getFile();
 
-         ListFilesWithPreviewView.this.getNode().getScene().setCursor(Cursor.WAIT);
+         CursorHelper cursorHelper = CursorHelper.forSceneOf(getNode());
+         cursorHelper.setCursor(Cursor.WAIT);
          Platform.runLater(() -> {
             callback.setCurrentSelection(newFile);
-            ListFilesWithPreviewView.this.getNode().getScene().setCursor(null);
+            cursorHelper.setCursor(null);
 
             if (newFile != null) {
                preview(newFile);
             }
          });
-       }
+      }
 
       private void preview(final File file) {
          previewHbox.getChildren().setAll(propertiesPreviewPane.getPane());

@@ -5,6 +5,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.stage.Window;
 
 import java.io.File;
@@ -233,5 +234,16 @@ public class DirectoryChooserFxImpl implements DirectoryChooserFx {
    public void showDialog(final Window ownerWindow,
                           final FileChooserCallback fileChooserCallback) {
       fileChooser.showOpenDialog(ownerWindow, fileChooserCallback, true);
+   }
+
+   /**
+    * Create a node containing the content of the dialog that would appear when using {@link #showDialog}. Do not
+    * interact with this instance after calling this method!
+    *
+    * @param fileChooserCallback the callback, invoked every time the user selects a different file
+    * @return the node
+    */
+   public Node createNode(final FileChooserCallback fileChooserCallback) {
+      return fileChooser.createOpenNode(fileChooserCallback, true);
    }
 }

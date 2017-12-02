@@ -143,7 +143,8 @@ public class PropertiesPreviewPane {
     * @param file
     */
    public void setFile(final File file) {
-      vBox.getScene().setCursor(Cursor.WAIT);
+      CursorHelper cursorHelper = CursorHelper.forSceneOf(vBox);
+      cursorHelper.setCursor(Cursor.WAIT);
 
       Platform.runLater(() ->  {
          try {
@@ -168,7 +169,7 @@ public class PropertiesPreviewPane {
             sizeLabel.setText(null);
          }
 
-         vBox.getScene().setCursor(null);
+         cursorHelper.setCursor(null);
       });
    }
 
